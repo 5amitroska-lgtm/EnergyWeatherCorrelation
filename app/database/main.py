@@ -1,4 +1,9 @@
+import database
 import sqlite3
+import os
+
+print("DB PATH:", os.path.abspath("data.db"))
+database.init_db()
 
 conn = sqlite3.connect("data.db")
 cursor = conn.cursor()
