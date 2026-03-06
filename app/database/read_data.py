@@ -1,8 +1,11 @@
 import sqlite3
+from datetime import datetime
 
 DB_PATH = "data.db"
+timestamp_str_now_hour_rounded = datetime.now().strftime('%Y-%m-%dT%H:00:00')
 
 def show_all():
+    """Function  prints all the rows in the database ordered by timestamp"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
@@ -21,6 +24,7 @@ def show_all():
 
 
 def show_today():
+    """Function  prints all rows corresponding to the current date form 00:00 to 23:00"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
@@ -40,6 +44,7 @@ def show_today():
 
 
 def show_last_24h():
+    """Function  prints last 24 hour rows"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
@@ -59,6 +64,7 @@ def show_last_24h():
 
 
 def show_daily_avg():
+    """Function  prints daily average rows"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
@@ -76,9 +82,52 @@ def show_daily_avg():
     for row in rows:
         print(row)
 
+def select_by_timestamp(dt: datetime):
+    """Function  prints a row corresponding to the given timestamp"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id, timestamp, value
+        FROM api_data WHERE timestamp == ?
+    """, (dt,))
+
+    rows = cursor.fetchall()
+    conn.close()
+    for row in rows:
+        print(row)
+
+def remove_duplicates():
+    """Function removes duplicated rows in DB"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        DELETE FROM api_data
+        WHERE id NOT IN (
+            SELECT MIN(id)
+            FROM api_data
+            GROUP BY timestamp
+        );
+    """)
+
+    conn.commit()
+    conn.close()
+
+def check_number_of_duplicates():
+    """Function checks duplicatd rows in the DB and prints a count of duplicates"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT timestamp, COUNT(*) FROM api_data GROUP BY timestamp HAVING COUNT(*) > 1")
+    print(len(cursor.fetchall()))
 
 if __name__ == "__main__":
-    show_all()
+    #show_all()
     show_today()
-    show_last_24h()
-    show_daily_avg()
+    #show_last_24h()
+    #show_daily_avg()
+    #print(timestamp_str_now_hour_rounded)
+    #select_by_timestamp(timestamp_str_now_hour_rounded)
+    #remove_duplicates()
+    #check_number_of_duplicates()
+
