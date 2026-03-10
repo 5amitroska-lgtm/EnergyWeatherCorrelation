@@ -1,7 +1,9 @@
 import sqlite3
 from datetime import datetime
+import os
 
-DB_PATH = "data.db"
+DB_PATH = os.path.join(os.path.dirname(__file__), "data.db")
+
 timestamp_str_now_hour_rounded = datetime.now().strftime('%Y-%m-%dT%H:00:00')
 
 def show_all():
@@ -10,8 +12,8 @@ def show_all():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT id, timestamp, value
-        FROM api_data
+        SELECT id, timestamp, value, source
+        FROM electricity_price_data
         ORDER BY timestamp DESC
     """)
 
@@ -29,8 +31,8 @@ def show_today():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT id, timestamp, value
-        FROM api_data
+        SELECT id, timestamp, value, source
+        FROM electricity_price_data
         WHERE date(timestamp) = date('now')
         ORDER BY timestamp
     """)
@@ -49,8 +51,8 @@ def show_last_24h():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT id, timestamp, value
-        FROM api_data
+        SELECT id, timestamp, value, source
+        FROM electricity_price_data
         WHERE timestamp >= datetime('now', '-1 day')
         ORDER BY timestamp
     """)
@@ -70,7 +72,7 @@ def show_daily_avg():
 
     cursor.execute("""
         SELECT date(timestamp) AS day, AVG(value) AS avg_price
-        FROM api_data
+        FROM electricity_price_data
         GROUP BY day
         ORDER BY day DESC
     """)
@@ -88,8 +90,8 @@ def select_by_timestamp(dt: datetime):
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT id, timestamp, value
-        FROM api_data WHERE timestamp == ?
+        SELECT id, timestamp, value, source
+        FROM electricity_price_data WHERE timestamp == ?
     """, (dt,))
 
     rows = cursor.fetchall()
@@ -97,17 +99,32 @@ def select_by_timestamp(dt: datetime):
     for row in rows:
         print(row)
 
-def remove_duplicates():
-    """Function removes duplicated rows in DB"""
+def select_by_source(source):
+    """Function  prints a row corresponding to the given timestamp"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("""
-        DELETE FROM api_data
+        SELECT id, timestamp, value, source
+        FROM electricity_price_data WHERE source == ?
+    """, (source,))
+
+    rows = cursor.fetchall()
+    conn.close()
+    for row in rows:
+        print(row)
+
+def remove_duplicates():
+    """Function removes duplicated rows in DB only if all values match"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        DELETE FROM electricity_price_data
         WHERE id NOT IN (
             SELECT MIN(id)
-            FROM api_data
-            GROUP BY timestamp
+            FROM electricity_price_data
+            GROUP BY timestamp, value, source
         );
     """)
 
@@ -118,16 +135,16 @@ def check_number_of_duplicates():
     """Function checks duplicatd rows in the DB and prints a count of duplicates"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("SELECT timestamp, COUNT(*) FROM api_data GROUP BY timestamp HAVING COUNT(*) > 1")
+    cursor.execute("SELECT timestamp, COUNT(*) FROM electricity_price_data GROUP BY timestamp HAVING COUNT(*) > 1")
     print(len(cursor.fetchall()))
 
 if __name__ == "__main__":
+    remove_duplicates()
     #show_all()
-    show_today()
+    #show_today()
     #show_last_24h()
     #show_daily_avg()
     #print(timestamp_str_now_hour_rounded)
-    #select_by_timestamp(timestamp_str_now_hour_rounded)
-    #remove_duplicates()
-    #check_number_of_duplicates()
-
+    select_by_source('electricity_price_cz')
+    select_by_timestamp(timestamp_str_now_hour_rounded)
+    check_number_of_duplicates()
