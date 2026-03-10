@@ -1,7 +1,10 @@
 import sqlite3
+import os
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "data.db")
 
 def init_db():
-    conn = sqlite3.connect("data.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -9,7 +12,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             timestamp TEXT NOT NULL,
             value REAL NOT NULL,
-            source TEXT NOT NULL
+            source TEXT NOT NULL            
         );
     """)
 

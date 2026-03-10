@@ -1,8 +1,9 @@
 import requests
 import sqlite3
 from datetime import datetime, date, timedelta
+import os
 
-print("Skript na ceny elektriny sa spustil!")
+DB_PATH = os.path.join(os.path.dirname(__file__), "data.db")
 
 today = date.today()
 tomorrow = today + timedelta(days=1)
@@ -12,13 +13,13 @@ url = (
     f"country=CZE&start={today}&end={tomorrow}"
 )
 
-def save_to_db(timestamp, value, source):
-    conn = sqlite3.connect("data.db")
+def save_to_db(timestamp, value):
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute(
-        "INSERT INTO api_data (timestamp, value, source) VALUES (?, ?, ?)",
-        (timestamp, value, source)
+        "INSERT INTO electricity_price_data (timestamp, value, source) VALUES (?, ?, ?)",
+        (timestamp, value, "electricity_price_cz")
     )
 
     conn.commit()
@@ -39,12 +40,12 @@ def fetch_prices_cz():
 
     return results
 
-def fetch_and_store_energy():
+def fetch_and_store_electricity_price():
     rows = fetch_prices_cz()
 
     for timestamp, value in rows:
-        save_to_db(timestamp, value, "electricity_price")
-        print("Uložené (elektrina):", timestamp, value)
+        save_to_db(timestamp, value)
+        print("Uložené:", timestamp, value)
 
 if __name__ == "__main__":
-    fetch_and_store_energy()
+    fetch_and_store_electricity_price()
