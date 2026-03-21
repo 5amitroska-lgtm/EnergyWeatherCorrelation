@@ -2,6 +2,7 @@ import sqlite3
 from datetime import datetime
 import os
 
+
 DB_PATH = os.path.join(os.path.dirname(__file__), "data.db")
 
 timestamp_str_now_hour_rounded = datetime.now().strftime('%Y-%m-%dT%H:00:00')
@@ -96,6 +97,8 @@ def select_by_timestamp(dt: datetime):
 
     rows = cursor.fetchall()
     conn.close()
+    if len(rows) == 0:
+        print(f"No rows for timestamp {datetime}")
     for row in rows:
         print(row)
 
@@ -145,6 +148,7 @@ if __name__ == "__main__":
     #show_last_24h()
     #show_daily_avg()
     #print(timestamp_str_now_hour_rounded)
-    select_by_source('electricity_price_cz')
+    #select_by_source('electricity_price_cz')
+    print(timestamp_str_now_hour_rounded)
     select_by_timestamp(timestamp_str_now_hour_rounded)
     check_number_of_duplicates()

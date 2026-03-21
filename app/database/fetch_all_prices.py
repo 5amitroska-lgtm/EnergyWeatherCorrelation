@@ -12,33 +12,33 @@ ZONES = {
     "AT": "Rakúsko",
     "CH": "Švajčiarsko",
     "FR": "Francúzsko",
-    "NL": "Holandsko",
-    "BE": "Belgicko",
-    "DK1": "Dánsko – západ",
-    "DK2": "Dánsko – východ",
-    "SE1": "Švédsko – SE1",
-    "SE2": "Švédsko – SE2",
-    "SE3": "Švédsko – SE3",
-    "SE4": "Švédsko – SE4",
-    "NO1": "Nórsko – NO1",
-    "NO2": "Nórsko – NO2",
-    "NO3": "Nórsko – NO3",
-    "NO4": "Nórsko – NO4",
-    "NO5": "Nórsko – NO5",
-    "FI": "Fínsko",
-    "PL": "Poľsko",
-    "IT-NORD": "Taliansko – sever",
-    "IT-CNOR": "Taliansko – stred sever",
-    "IT-CSUD": "Taliansko – stred juh",
-    "IT-SUD": "Taliansko – juh",
-    "IT-SARD": "Taliansko – Sardínia",
-    "IT-SICI": "Taliansko – Sicília",
-    "ES": "Španielsko",
-    "PT": "Portugalsko",
-    "HU": "Maďarsko",
-    "SK": "Slovensko",
-    "SI": "Slovinsko",
-    "HR": "Chorvátsko"
+    # "NL": "Holandsko",
+    # "BE": "Belgicko",
+    # "DK1": "Dánsko – západ",
+    # "DK2": "Dánsko – východ",
+    # "SE1": "Švédsko – SE1",
+    # "SE2": "Švédsko – SE2",
+    # "SE3": "Švédsko – SE3",
+    # "SE4": "Švédsko – SE4",
+    # "NO1": "Nórsko – NO1",
+    # "NO2": "Nórsko – NO2",
+    # "NO3": "Nórsko – NO3",
+    # "NO4": "Nórsko – NO4",
+    # "NO5": "Nórsko – NO5",
+    # "FI": "Fínsko",
+    # "PL": "Poľsko",
+    # "IT-NORD": "Taliansko – sever",
+    # "IT-CNOR": "Taliansko – stred sever",
+    # "IT-CSUD": "Taliansko – stred juh",
+    # "IT-SUD": "Taliansko – juh",
+    # "IT-SARD": "Taliansko – Sardínia",
+    # "IT-SICI": "Taliansko – Sicília",
+    # "ES": "Španielsko",
+    # "PT": "Portugalsko",
+    # "HU": "Maďarsko",
+    # "SK": "Slovensko",
+    # "SI": "Slovinsko",
+    # "HR": "Chorvátsko"
 }
 
 END = date.today()
@@ -78,7 +78,7 @@ def fetch_prices(zone):
     return None
 
 
-def fetch_and_store_by_zone(zone):
+def fetch_and_store_by_zone(zone: str):
     name = ZONES[zone]
     print(f"➡️  {zone} – {name}")
 
@@ -104,7 +104,7 @@ def fetch_and_store_all_prices():
     print(f"Sťahujem dáta od {START} do {END} (365 dní)...")
 
     with ThreadPoolExecutor(max_workers=10) as executor:
-        executor.map(fetch_and_store_zone, ZONES.keys())
+        executor.map(fetch_and_store_by_zone, ZONES.keys())
 
 
 if __name__ == "__main__":

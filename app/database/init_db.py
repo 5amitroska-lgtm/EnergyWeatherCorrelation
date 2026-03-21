@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import pandas as pd
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "data.db")
 
@@ -27,3 +28,11 @@ def init_db():
 
     conn.commit()
     conn.close()
+
+def show_table(table_name):
+    conn = sqlite3.connect(DB_PATH)
+
+    df = pd.read_sql_query(f"SELECT * FROM {table_name}", conn)
+
+    conn.close()
+    return df
