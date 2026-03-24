@@ -183,3 +183,4 @@ def fetch_and_store_all_prices():
     sqlite3.connect(DB_PATH).close()
 
     print("✔️ Hotovo – všetky ceny uložené.")
+
