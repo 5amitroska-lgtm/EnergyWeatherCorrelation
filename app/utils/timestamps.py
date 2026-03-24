@@ -36,7 +36,3 @@ class Timestamp:
         date_str = f"{self.year}-{self.month}-{self.day}"
         dt = datetime.strptime(date_str, "%Y-%m-%d")
         return str(dt.strftime("%Y-%m-%dT%H:00:00"))
-
-
-timestamp = Timestamp(2026, 1, 1)
-print(timestamp.convert_to_datetime())

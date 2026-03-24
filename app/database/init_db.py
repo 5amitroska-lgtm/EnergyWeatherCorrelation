@@ -12,6 +12,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS electricity_price_data (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             timestamp TEXT NOT NULL,
+            zone TEXT NOT NULL,
             value REAL NOT NULL,
             source TEXT NOT NULL            
         );
@@ -22,6 +23,7 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             timestamp TEXT NOT NULL,
             value REAL NOT NULL,
+            zone TEXT NOT NULL,
             source TEXT NOT NULL
         );
     """)

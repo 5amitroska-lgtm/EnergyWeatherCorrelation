@@ -4,14 +4,14 @@ import plotly.graph_objects as go
 import os
 from datetime import date
 
-# Cesta k databáze
 DB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "database", "data.db"))
+
 class Graf:
 
     def __init__(self, downsample, resample, date_from, date_to):
-        self.downsample = downsample  # každý 10. riadok (10)
-        self.resample = resample  # "1h"  # agregácia na hodinové priemery
-        self.webgl = True  # WebGL rendering
+        self.downsample = downsample
+        self.resample = resample
+        self.webgl = True
         self.date_from = date_from
         self.date_to = date_to
 
@@ -22,8 +22,8 @@ class Graf:
         q_price = f"""
             SELECT timestamp, value
             FROM electricity_price_data
-            WHERE source LIKE '{zone} - %'
-                AND timestamp BETWEEN '{self.date_from}' AND '{self.date_to}'
+            WHERE zone = '{zone}'
+              AND timestamp BETWEEN '{self.date_from}' AND '{self.date_to}'
             ORDER BY timestamp
         """
         df_price = pd.read_sql_query(q_price, conn)
@@ -35,7 +35,7 @@ class Graf:
             SELECT timestamp, value, source
             FROM weather_data
             WHERE source LIKE '{zone}_%'
-                AND timestamp BETWEEN '{self.date_from}' AND '{self.date_to}'
+              AND timestamp BETWEEN '{self.date_from}' AND '{self.date_to}'
             ORDER BY timestamp
         """
         df_weather = pd.read_sql_query(q_weather, conn)
@@ -45,6 +45,8 @@ class Graf:
             return df_price
 
         df_weather["timestamp"] = pd.to_datetime(df_weather["timestamp"], format="ISO8601")
+
+        # extrahovať názov premennej (temperature, cloudcover, precipitation…)
         df_weather["variable"] = df_weather["source"].str.replace(f"{zone}_", "", regex=False)
 
         # odstrániť textové hodnoty (weather_text)
@@ -67,7 +69,7 @@ class Graf:
         # --- MERGE ---
         df = df_price.merge(df_weather, on="timestamp", how="left")
 
-        # --- RESAMPLE (1h) ---
+        # --- RESAMPLE ---
         df = (
             df.set_index("timestamp")
             .resample(self.resample)
@@ -75,12 +77,11 @@ class Graf:
             .reset_index()
         )
 
-        # --- DOWNSAMPLE PO MERGE (najdôležitejšie!) ---
-        df = df.iloc[::self.downsample]  # každý 30. bod → 30× rýchlejšie
+        # --- DOWNSAMPLE ---
+        df = df.iloc[::self.downsample]
 
         return df
 
-    # --- GRAF: CENA + POČASIE ---
     def plot_zone(self, zone):
         df = self.load_zone(zone)
 
@@ -136,11 +137,3 @@ class Graf:
         )
 
         fig.show()
-
-# --- TEST ---
-if __name__ == "__main__":
-    graf= Graf(1,"1h", date(2026, 1, 1), date(2026, 1, 31))
-    zone = "CH"
-    graf.plot_zone(zone)
-    zone = "AT"
-    graf.plot_zone(zone)

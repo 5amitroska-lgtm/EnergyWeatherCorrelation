@@ -1,5 +1,5 @@
 from app.database.fetch_all_prices import fetch_and_store_all_prices
-from app.database.read_data import remove_duplicates
+from app.database.read_data import select_all_available_zones_for_datetime
 from database import init_db
 from database.fetch_all_weather import fetch_weather_all
 from app.utils.timestamps import Timestamp
@@ -9,14 +9,50 @@ from datetime import date
 
 if __name__ == "__main__":
     init_db()
-    fetch_and_store_all_prices()
-    fetch_weather_all()
-    timestamp = Timestamp(2026,3,20).convert_to_datetime()
-    print(timestamp)
-    remove_duplicates()
-    select_by_timestamp(timestamp)
-    graf= Graf(1,"1h", date(2026, 1, 1), date(2026, 1, 31))
-    zone = "CH"
-    graf.plot_zone(zone)
-    zone = "AT"
-    graf.plot_zone(zone)
+    ZONE_CODES = [
+        "CZE",
+        "DE-LU",
+        "AT",
+        "CH",
+        "FR",
+        "NL",
+        "BE",
+        "DK1",
+        "DK2",
+        "SE1",
+        "NO1",
+        "FI",
+        "PL",
+        "IT-NORD",
+        "IT-CNOR",
+        "IT-CSUD",
+        "IT-SUD",
+        "IT-SARD",
+        "IT-SICI",
+        "ES",
+        "PT",
+        "HU"
+        # "SK",
+        # "SI",
+        # "HR"
+    ]
+    # fetch_and_store_all_prices()
+    # fetch_weather_all()
+    try:
+        graf = Graf(1, "1h", date(2026, 1, 1), date(2026, 1, 31))
+        available_zones = select_all_available_zones_for_datetime(Timestamp(2026,1,1).convert_to_datetime())
+        # available_zones = []
+
+    except ValueError:
+        raise ("Non valid timestamp")
+
+    try:
+        if not available_zones:
+            raise ValueError("available_zones je prázdny – žiadne zóny na vykreslenie.")
+
+        for zone in available_zones:
+            graf.plot_zone(zone[0])
+
+    except Exception as e:
+        print("Chyba:", e)
+

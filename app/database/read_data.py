@@ -2,9 +2,7 @@ import sqlite3
 from datetime import datetime
 import os
 
-
 DB_PATH = os.path.join(os.path.dirname(__file__), "data.db")
-
 timestamp_str_now_hour_rounded = datetime.now().strftime('%Y-%m-%dT%H:00:00')
 
 def show_all():
@@ -84,6 +82,27 @@ def show_daily_avg():
     print("\n--- Priemerná cena za deň ---")
     for row in rows:
         print(row)
+def select_all_available_zones_for_datetime(dt:datetime):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+           SELECT zone
+           FROM electricity_price_data WHERE timestamp == ?
+       """, (dt,))
+
+    rows = cursor.fetchall()
+    conn.close()
+    available_zones = []
+    try:
+        for row in rows:
+            print(row[0])
+            available_zones.append(row)
+    except Exception as e:
+        print(e)
+    return available_zones
+
+
 
 def select_by_timestamp(dt: datetime):
     """Function  prints a row corresponding to the given timestamp"""
@@ -142,7 +161,7 @@ def check_number_of_duplicates():
     print(len(cursor.fetchall()))
 
 if __name__ == "__main__":
-    remove_duplicates()
+    # remove_duplicates()
     #show_all()
     #show_today()
     #show_last_24h()
@@ -150,5 +169,5 @@ if __name__ == "__main__":
     #print(timestamp_str_now_hour_rounded)
     #select_by_source('electricity_price_cz')
     print(timestamp_str_now_hour_rounded)
-    select_by_timestamp(timestamp_str_now_hour_rounded)
+    select_by_timestamp("2026-03-01T09:00:00")
     check_number_of_duplicates()
