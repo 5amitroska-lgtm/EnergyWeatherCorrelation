@@ -3,3 +3,4 @@ matplotlib
 requests
 plotly
 sqlalchemy
+fastapi[standard]
