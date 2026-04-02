@@ -22,3 +22,6 @@ class Electricity:
 
 temp=Electricity(datetime(2026,2,3, 10, 0,0))
 temp.speak()
+
+#repository class
+#3vrstva architektura

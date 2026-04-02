@@ -6,6 +6,10 @@ from app.utils.timestamps import Timestamp
 from app.database.read_data import select_by_timestamp
 from app.modules.graf import Graf
 from datetime import date
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
     init_db()
@@ -38,21 +42,25 @@ if __name__ == "__main__":
     ]
     # fetch_and_store_all_prices()
     # fetch_weather_all()
-    try:
-        graf = Graf(1, "1h", date(2026, 1, 1), date(2026, 1, 31))
-        available_zones = select_all_available_zones_for_datetime(Timestamp(2026,1,1).convert_to_datetime())
-        # available_zones = []
+    # try:
+    #     graf = Graf(1, "1h", date(2026, 1, 1), date(2026, 1, 31))
+    #     available_zones = select_all_available_zones_for_datetime(Timestamp(2026,1,1).convert_to_datetime())
+    #     available_zones = []
+    #
+    # except ValueError:
+    #     raise ("Non valid timestamp")
+    #
+    # try:
+    #     if not available_zones:
+    #         raise ValueError("available_zones je prázdny – žiadne zóny na vykreslenie.")
+    #
+    #     else:
+    #         for zone in available_zones:
+    #             graf.plot_zone(zone[0])
+    #             logger.info(f"graf vykresleny pre{zone[0]}")
+    #
+    # except Exception as e:
+    #     print("Chyba:", e)
+    #     logger.exception("Chyba:", e)
 
-    except ValueError:
-        raise ("Non valid timestamp")
-
-    try:
-        if not available_zones:
-            raise ValueError("available_zones je prázdny – žiadne zóny na vykreslenie.")
-
-        for zone in available_zones:
-            graf.plot_zone(zone[0])
-
-    except Exception as e:
-        print("Chyba:", e)
-
+print(Timestamp(2026,1,1).convert_to_datetime())
