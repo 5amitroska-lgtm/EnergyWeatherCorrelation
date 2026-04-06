@@ -1,12 +1,29 @@
 from app.database.fetch_all_prices import fetch_and_store_all_prices
 from app.database.read_data import select_all_available_zones_for_datetime
-from database import init_db
-from database.fetch_all_weather import fetch_weather_all
+from app.database import init_db
+from app.database.fetch_all_weather import fetch_weather_all
 from app.utils.timestamps import Timestamp
 from app.database.read_data import select_by_timestamp
 from app.modules.graf import Graf
 from datetime import date
 import logging
+from fastapi import FastAPI
+from app.routers.read_data_electricity_api import router as electricity_router
+from app.routers.read_data_weather_api import router as weather_router
+
+
+# Import routerov
+app = FastAPI(
+    title="WeatherDataCorrelation",
+    version="1.0.0"
+)
+
+# Registrácia routerov
+app.include_router(electricity_router)
+app.include_router(weather_router)
+@app.get("/")
+def root():
+    return {"message": "EnergyWeatherCorrelation API is running 🚀"}
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -64,3 +81,5 @@ if __name__ == "__main__":
     #     logger.exception("Chyba:", e)
 
 print(Timestamp(2026,1,1).convert_to_datetime())
+
+
