@@ -18,7 +18,7 @@ class Graf:
     def load_zone(self, zone):
         conn = sqlite3.connect(DB_PATH)
 
-        # --- CENY ---
+        # --- PRICES ---
         q_price = f"""
             SELECT timestamp, value
             FROM electricity_price_data
@@ -30,7 +30,7 @@ class Graf:
         df_price["timestamp"] = pd.to_datetime(df_price["timestamp"], format="ISO8601")
         df_price = df_price.rename(columns={"value": "price"})
 
-        # --- POČASIE ---
+        # --- WEATHER ---
         q_weather = f"""
             SELECT timestamp, value, source
             FROM weather_data
@@ -46,13 +46,13 @@ class Graf:
 
         df_weather["timestamp"] = pd.to_datetime(df_weather["timestamp"], format="ISO8601")
 
-        # extrahovať názov premennej (temperature, cloudcover, precipitation…)
+        # names of variables (temperature, cloudcover, precipitation…)
         df_weather["variable"] = df_weather["source"].str.replace(f"{zone}_", "", regex=False)
 
-        # odstrániť textové hodnoty (weather_text)
+        # remove strings (weather_text)
         df_weather = df_weather[df_weather["value"].apply(lambda x: isinstance(x, (int, float)))]
 
-        # odstrániť duplicity
+        # remove duplicates
         df_weather = (
             df_weather
             .groupby(["timestamp", "variable"], as_index=False)
@@ -87,7 +87,7 @@ class Graf:
 
         fig = go.Figure()
 
-        # Cena elektriny
+        # Electricity prices
         fig.add_trace(go.Scatter(
             x=df["timestamp"], y=df["price"],
             mode="lines",
@@ -95,7 +95,7 @@ class Graf:
             line=dict(color="red", width=2)
         ))
 
-        # Teplota
+        # Temperature
         if "temperature" in df:
             fig.add_trace(go.Scatter(
                 x=df["timestamp"], y=df["temperature"],
@@ -105,7 +105,7 @@ class Graf:
                 line=dict(color="blue", width=1)
             ))
 
-        # Oblačnosť
+        # Cloudcover
         if "cloudcover" in df:
             fig.add_trace(go.Scatter(
                 x=df["timestamp"], y=df["cloudcover"],
@@ -115,7 +115,7 @@ class Graf:
                 line=dict(color="gray", width=1)
             ))
 
-        # Zrážky
+        # Precipitation
         if "precipitation" in df:
             fig.add_trace(go.Scatter(
                 x=df["timestamp"], y=df["precipitation"],

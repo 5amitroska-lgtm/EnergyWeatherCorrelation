@@ -1,14 +1,14 @@
 # EnergyWeather Correlation
 
-Projekt analyzuje vzťah medzi hodinovými cenami elektriny v Česku a priemernou dennou teplotou krajiny. Dáta sa získavajú automaticky z verejných API, ukladajú do lokálnej SQLite databázy a následne sa vizualizujú a porovnávajú.
+Projekt analyzuje vzťah medzi hodinovými cenami elektriny v Europe podla krajiny a priemernou dennou teplotou krajiny. Dáta sa získavajú automaticky z verejných API, ukladajú do lokálnej SQLite databázy a následne sa vizualizujú a porovnávajú.
 
 ---
 
 ## 🔍 Ciele projektu
-- Získať hodinové ceny elektriny pre Česko (EUR/MWh).
-- Získať priemernú dennú teplotu krajiny.
+- Získať hodinové ceny elektriny pre Europu (EUR/MWh).
+- Získať priemernú dennú teplotu krajiny a pocasie.
 - Ukladať dáta do SQLite databázy.
-- Porovnávať vývoj cien elektriny s teplotou.
+- Porovnávať vývoj cien elektriny s pocasim.
 - Vytvoriť základ pre ďalšiu analýzu alebo vizualizáciu.
 
 ---
@@ -23,11 +23,23 @@ Projekt analyzuje vzťah medzi hodinovými cenami elektriny v Česku a priemerno
 - Parametre: `country=CZE`, `start=YYYY-MM-DD`, `end=YYYY-MM-DD`
 - Výstup:  
   - `unix_seconds[]` – časové značky  
-  - `price[]` – ceny v EUR/MWh  
+  - `vaule[]` – ceny v EUR/MWh  
+  - `zone[]` – zona v Europe
 
 ### 2. Teplota – Open-Meteo API
 - Endpoint: `https://api.open-meteo.com/v1/climate`
-- Výstup: priemerná denná teplota pre danú krajinu
+- Výstup:
+  - `unix_seconds[]` – časové značky  
+  - `vaule[]` – hodnota 
+  - `zone[]` – zona v Europe
+  - `source[]` – typ hodnoty pocasia
+    - ej.:
+      -  CZE	CZE_temperature 
+      - CZE	CZE_cloudcover      
+      - CZE	CZE_precipitation
+      - CZE	CZE_weathercode 
+      - CZE	CZE_weather_text
+
 
 ---
 
@@ -37,14 +49,6 @@ Použitá je **SQLite**, pretože:
 - nevyžaduje server,
 - je ideálna pre malé a demo projekty,
 - je súčasťou Pythonu.
-
-### Štruktúra tabuľky `api_data`
-
-| stĺpec     | typ     | popis |
-|------------|---------|-------|
-| id         | INTEGER | Primárny kľúč |
-| timestamp  | TEXT    | ISO časová značka |
-| value      | REAL    | Cena elektriny alebo teplota |
 
 ---
 
@@ -63,9 +67,15 @@ pip install -r requirements.txt
 
 ## 📥 Zber dát
 
-### Spustenie skriptu na získanie cien elektriny
+### Spustenie skriptu na zber dat a nasledne vykreslenie grafov podla Zony
 
-python app/database/read_data.py
+run main
+
+pre otvorenie Swaggeru: 
+- uvicorn app.main:app --reload
+- http://127.0.0.1:8000/docs
+  
+
 
 
 ---
@@ -81,14 +91,6 @@ Výstupom môže byť:
 - tabuľka,
 - graf,
 - korelačný koeficient.
-
----
-
-## 🧪 Plánovanie automatického zberu dát
-
-### Windows Task Scheduler
-- Trigger: Daily
-- Action: `python app/database/fetch_data.py`
 
 ---
 
