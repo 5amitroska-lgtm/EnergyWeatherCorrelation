@@ -1,7 +1,4 @@
-from fastapi import FastAPI, Request
-from pydantic import BaseModel
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI
 from sqlalchemy import create_engine
 from datetime import datetime
 import pandas as pd
@@ -17,6 +14,7 @@ router = APIRouter(
 
 @router.get("/datetime")
 def select_by_timestamp(dt: datetime):
+    """select weather data from datetime"""
     iso = dt.isoformat()
     with engine.connect() as conn:
 
@@ -34,6 +32,7 @@ def select_by_timestamp(dt: datetime):
 
 @router.get("/zone")
 def select_by_zone(zone: Zone):
+    """select weather data for zone"""
     with engine.connect() as conn:
 
         query = """
@@ -48,42 +47,56 @@ def select_by_zone(zone: Zone):
             return {"message": f"No rows for timestamp {zone}"}
         return rows.to_dict(orient="records")
 
+
 @router.get("/zone/dailyAVG")
-def electricity_daily_avg(zone: Zone):
+def weather_daily_avg(zone: Zone):
+    """Return daily average for each weather source separately for given zone."""
+
+    query = """
+        SELECT 
+            date(timestamp) AS day,
+            source,
+            AVG(value) AS avg_value
+        FROM weather_data
+        WHERE zone = ?
+        GROUP BY day, source
+        ORDER BY day DESC, source
+    """
+
     with engine.connect() as conn:
-        query = """
-            SELECT date(timestamp) AS day, AVG(value) AS avg_price
-            FROM weather_data
-            WHERE zone = ?
-            GROUP BY day
-            ORDER BY day DESC
-        """
-        rows = pd.read_sql(query, conn, params=(zone,))
+        rows = pd.read_sql_query(query, conn, params=(zone.value,))
 
-        if len(rows) == 0:
-            return {"message": f"No rows for timestamp {zone}"}
+    if rows.empty:
+        return {"message": f"No weather data for zone {zone.value}"}
 
-        return rows.to_dict(orient="records")
+    return rows.to_dict(orient="records")
+
 
 @router.get("/availableZones")
-def select_electricity_available_zones(dt:datetime):
-    iso = dt.isoformat()
-    with engine.connect() as conn:
-        query = """
+def select_weather_available_zones(dt:datetime):
+    """select all available zones for datetime"""
+    dt_str = dt.strftime("%Y-%m-%dT%H:%M:%S")
+
+    query = """
            SELECT zone
-           FROM weather_data WHERE timestamp == ?
+           FROM weather_data
+           WHERE timestamp = ?
        """
-        rows = pd.read_sql(query, conn, params=(iso,))
-        if len(rows) == 0:
-            return {"message": f"No rows for timestamp {iso}"}
-        return rows.to_dict(orient="records")
+
+    with engine.connect() as conn:
+        rows = pd.read_sql_query(query, conn, params=(dt_str,))
+        zones = rows["zone"].tolist()
+        unique_zones = list(dict.fromkeys(zones))
+
+    return unique_zones
 
 @router.get("/value")
-def select_electricity_value(dt:datetime, zone: Zone):
+def select_weather_value(dt:datetime, zone: Zone):
+    """select weather value from datetime"""
     iso = dt.isoformat()
     with engine.connect() as conn:
         query = """
-            SELECT timestamp, value, source
+            SELECT value, source
             FROM weather_data WHERE timestamp == ?
             AND zone = ?
         """
@@ -95,7 +108,7 @@ def select_electricity_value(dt:datetime, zone: Zone):
 
 if __name__ == "__main__":
 
-    print(select_by_zone(zone=(Zone.FR)))
+    print(select_weather_value(datetime(2026,1,1),zone="FR"))
 
 
 
