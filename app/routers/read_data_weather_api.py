@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 @router.get("/datetime")
-def select_by_timestamp(dt: datetime):
+def select_by_timestamp(dt: datetime) -> dict:
     """select weather data from datetime"""
     iso = dt.isoformat()
     with engine.connect() as conn:
@@ -31,7 +31,7 @@ def select_by_timestamp(dt: datetime):
         return rows.to_dict(orient="records")
 
 @router.get("/zone")
-def select_by_zone(zone: Zone):
+def select_by_zone(zone: Zone) -> dict:
     """select weather data for zone"""
     with engine.connect() as conn:
 
@@ -49,7 +49,7 @@ def select_by_zone(zone: Zone):
 
 
 @router.get("/zone/dailyAVG")
-def weather_daily_avg(zone: Zone):
+def weather_daily_avg(zone: Zone) -> dict:
     """Return daily average for each weather source separately for given zone."""
 
     query = """
@@ -73,7 +73,7 @@ def weather_daily_avg(zone: Zone):
 
 
 @router.get("/availableZones")
-def select_weather_available_zones(dt:datetime):
+def select_weather_available_zones(dt:datetime) -> list:
     """select all available zones for datetime"""
     dt_str = dt.strftime("%Y-%m-%dT%H:%M:%S")
 
@@ -91,7 +91,7 @@ def select_weather_available_zones(dt:datetime):
     return unique_zones
 
 @router.get("/value")
-def select_weather_value(dt:datetime, zone: Zone):
+def select_weather_value(dt:datetime, zone: Zone) -> dict:
     """select weather value from datetime"""
     iso = dt.isoformat()
     with engine.connect() as conn:

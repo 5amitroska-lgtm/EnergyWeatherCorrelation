@@ -35,8 +35,8 @@ if __name__ == "__main__":
     #----------------------------------------------------
     # Methods for filling empty database
     #----------------------------------------------------
-    # fetch_and_store_all_prices()
-    # fetch_weather_all()
+    fetch_and_store_all_prices()
+    fetch_weather_all()
 
     try:
         #------------------------------------------------------

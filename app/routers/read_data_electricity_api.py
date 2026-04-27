@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 @router.get("/datetime")
-def select_by_timestamp(dt: datetime):
+def select_by_timestamp(dt: datetime)-> dict:
     """select electricity prices by datetime"""
     iso = dt.isoformat()
     with engine.connect() as conn:
@@ -32,7 +32,7 @@ def select_by_timestamp(dt: datetime):
         return rows.to_dict(orient="records")
 
 @router.get("/zone")
-def select_by_zone(zone: Zone):
+def select_by_zone(zone: Zone) -> dict:
     """Select electricity prices by zone"""
     with engine.connect() as conn:
 
@@ -49,7 +49,7 @@ def select_by_zone(zone: Zone):
         return rows.to_dict(orient="records")
 
 @router.get("/zone/dailyAVG")
-def electricity_daily_avg(zone: Zone):
+def electricity_daily_avg(zone: Zone) -> dict:
     """"select averaged electricity prices (one value per day) by zone"""
     with engine.connect() as conn:
         query = """
@@ -67,7 +67,7 @@ def electricity_daily_avg(zone: Zone):
         return rows.to_dict(orient="records")
 
 @router.get("/value")
-def select_electricity_value(dt:datetime, zone: Zone):
+def select_electricity_value(dt:datetime, zone: Zone) -> dict:
     """select value for timestamp and zone"""
     iso = dt.isoformat()
     with engine.connect() as conn:
@@ -82,7 +82,7 @@ def select_electricity_value(dt:datetime, zone: Zone):
         return rows.to_dict(orient="records")
 
 @router.get("/highestPrice")
-def find_highest_prices(fromDate: datetime, toDate: datetime, zone: Zone, limit: int):
+def find_highest_prices(fromDate: datetime, toDate: datetime, zone: Zone, limit: int) -> dict:
     """select the highest prices in the range fromDate to toDate by zone
         and limit is the number how many the highest prices do you want to show"""
     with engine.connect() as conn:
@@ -102,7 +102,7 @@ def find_highest_prices(fromDate: datetime, toDate: datetime, zone: Zone, limit:
         print(order_rows)
 
 @router.get("/lowestPrice")
-def find_lowest_prices(fromDate: datetime, toDate: datetime, zone: Zone, limit: int):
+def find_lowest_prices(fromDate: datetime, toDate: datetime, zone: Zone, limit: int) -> dict:
     """select the lowes prices in the range fromDate to toDate by zone
         and limit is the number how many the lowest prices do you want to show"""
     with engine.connect() as conn:
@@ -122,7 +122,7 @@ def find_lowest_prices(fromDate: datetime, toDate: datetime, zone: Zone, limit: 
         print(order_rows)
 
 @router.get("/available_zones")
-def select_all_available_zones_for_datetime(dt: datetime):
+def select_all_available_zones_for_datetime(dt: datetime) -> list:
     """select all available zones for datetime"""
     dt_str = dt.strftime("%Y-%m-%dT%H:%M:%S")
 

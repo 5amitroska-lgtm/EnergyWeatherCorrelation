@@ -132,7 +132,7 @@ def fetch_and_store_by_zone(zone: str):
     batch = []
     for ts, price in zip(timestamps, prices):
 
-        # 🔥 preskočíme neplatné hodnoty
+        #  preskočíme neplatné hodnoty
         if price is None:
             continue
 
