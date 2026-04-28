@@ -146,7 +146,7 @@ Použitá je **SQLite**, pretože:
 - je ideálna pre malé a demo projekty,
 - je súčasťou Pythonu.
 
-Príklad y tabuľky electricity_price_data
+Príklad y tabuľky ***electricity_price_data***
 
 | ID     | Timestamp           | Krajina | Hodnota | Názov krajiny |
 |--------|----------------------|---------|---------|----------------|
@@ -157,7 +157,7 @@ Príklad y tabuľky electricity_price_data
 | 300511 | 2026-01-21T00:30:00 | FR      | 102.13  | Francúzsko     |
 | 300512 | 2026-01-21T00:45:00 | FR      | 104.15  | Francúzsko     |
 
-Príklad y tabuľky weather_data
+Príklad z tabuľky ***weather_data***
 
 | ID     | Timestamp           | Hodnota | Kód krajiny | Parameter          |
 |--------|----------------------|---------|-------------|--------------------|
