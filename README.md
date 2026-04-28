@@ -197,8 +197,6 @@ Príkaz pre spustenie FastAPI
 Príkaz pre spustenie zberu dát  
   - python main.py.
 
-To usnadní první spuštění projektu.
-
 ### 1. Klonovanie projektu
 
 git clone https://github.com/username/EnergyWeather-Correlation.git (github.com in Bing)
@@ -231,7 +229,8 @@ Skript `graf.py` porovnáva:
 
 Výstupom je graf:
  - pre všetky dostupne zóny v Európe
- - spúšťa sa automatickz po zbere dát v main
+ - spúšťa sa automatickz po zbere dát v main 
+ - pre každú dostupnú zónu sa vytvorí jeden graf
 
 ![Diagram](newplot.png)
 ---
@@ -242,8 +241,8 @@ MIT License
 ---
 
 ## 👤 Autor
-Petra Mitroova
-Slovenska republika 
+Petra Mitróová
+Slovenská republika 
 2026
 
 🚀 Future Work
