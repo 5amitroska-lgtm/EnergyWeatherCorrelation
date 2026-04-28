@@ -5,7 +5,7 @@ Projekt analyzuje vzťah medzi hodinovými cenami elektriny v Europe podla kraji
 ---
 
 ## 🔍 Ciele projektu
-- Získať hodinové ceny elektriny pre Europu (EUR/MWh).
+- Získať hodinové ceny elektriny pre Európu (EUR/MWh).
 - Získať priemernú dennú teplotu krajiny a pocasie.
 - Ukladať dáta do SQLite databázy.
 - Porovnávať vývoj cien elektriny s pocasim.
@@ -21,18 +21,100 @@ Projekt analyzuje vzťah medzi hodinovými cenami elektriny v Europe podla kraji
 ### 1. Ceny elektriny – Energy-Charts API
 - Endpoint: `https://api.energy-charts.info/price`
 - Parametre: `country=CZE`, `start=YYYY-MM-DD`, `end=YYYY-MM-DD`
-- Výstup:  
-  - `unix_seconds[]` – časové značky  
-  - `vaule[]` – ceny v EUR/MWh  
-  - `zone[]` – zona v Europe
+- Príklad response z API:
+    ```json [
+  {
+    "id": 300507,
+    "timestamp": "2026-01-20T23:30:00",
+    "zone": "FR",
+    "value": 107.42,
+    "country_name": "Francúzsko"
+  },
+  {
+    "id": 300508,
+    "timestamp": "2026-01-20T23:45:00",
+    "zone": "FR",
+    "value": 98.14,
+    "country_name": "Francúzsko"
+  },
+  {
+    "id": 300509,
+    "timestamp": "2026-01-21T00:00:00",
+    "zone": "FR",
+    "value": 99.93,
+    "country_name": "Francúzsko"
+  },
+  {
+    "id": 300510,
+    "timestamp": "2026-01-21T00:15:00",
+    "zone": "FR",
+    "value": 99.75,
+    "country_name": "Francúzsko"
+  },
+  {
+    "id": 300511,
+    "timestamp": "2026-01-21T00:30:00",
+    "zone": "FR",
+    "value": 102.13,
+    "country_name": "Francúzsko"
+  }
+]
 
-### 2. Teplota – Open-Meteo API
+- Výstup:  
+  - `id[]` – unikátny identifikátor
+  - `timestamp[]` – časové značky  
+  - `vaule[]` – ceny v EUR/MWh  
+  - `zone[]` – zona v Európe
+  - `source[]` – názov zóny
+
+
+### 2. Počasie – Open-Meteo API
 - Endpoint: `https://api.open-meteo.com/v1/climate`
+  - Príklad response z API:
+    ```json [
+      {
+        "id": 840888,
+        "timestamp": "2025-06-19T09:00:00",
+        "value": 0,
+        "zone": "ES",
+        "source": "ES_precipitation"
+      },
+      {
+        "id": 840889,
+        "timestamp": "2025-06-19T09:00:00",
+        "value": 3,
+        "zone": "ES",
+        "source": "ES_weathercode"
+      },
+      {
+        "id": 840890,
+        "timestamp": "2025-06-19T09:00:00",
+        "value": null,
+        "zone": "ES",
+        "source": "ES_weather_text"
+      },
+      {
+        "id": 840891,
+        "timestamp": "2025-06-19T10:00:00",
+        "value": 33.3,
+        "zone": "ES",
+        "source": "ES_temperature"
+      },
+      {
+        "id": 840892,
+        "timestamp": "2025-06-19T10:00:00",
+        "value": 100,
+        "zone": "ES",
+        "source": "ES_cloudcover"
+      }
+    ]
+
 - Výstup:
-  - `unix_seconds[]` – časové značky  
-  - `vaule[]` – hodnota 
-  - `zone[]` – zona v Europe
-  - `source[]` – typ hodnoty pocasia
+  - `id[]` – unikátny identifikátor
+  - `timestamp[]` – časové značky  
+  - `value[]` – hodnota 
+  - `zone[]` – zóna v Európe
+  - `source[]` – typ hodnoty počasia
     - ej.:
       -  CZE	CZE_temperature 
       - CZE	CZE_cloudcover      
@@ -40,6 +122,20 @@ Projekt analyzuje vzťah medzi hodinovými cenami elektriny v Europe podla kraji
       - CZE	CZE_weathercode 
       - CZE	CZE_weather_text
 
+
+---
+## 🗃️ Štruktúra projektu
+
+```markdown 
+app/
+├── api/
+├── database/
+├── modules/
+├── router/
+├── tests/
+├── utils/
+└── main.py
+```
 
 ---
 
@@ -50,9 +146,58 @@ Použitá je **SQLite**, pretože:
 - je ideálna pre malé a demo projekty,
 - je súčasťou Pythonu.
 
----
+Príklad y tabuľky electricity_price_data
 
+| ID     | Timestamp           | Krajina | Hodnota | Názov krajiny |
+|--------|----------------------|---------|---------|----------------|
+| 300507 | 2026-01-20T23:30:00 | FR      | 107.42  | Francúzsko     |
+| 300508 | 2026-01-20T23:45:00 | FR      | 98.14   | Francúzsko     |
+| 300509 | 2026-01-21T00:00:00 | FR      | 99.93   | Francúzsko     |
+| 300510 | 2026-01-21T00:15:00 | FR      | 99.75   | Francúzsko     |
+| 300511 | 2026-01-21T00:30:00 | FR      | 102.13  | Francúzsko     |
+| 300512 | 2026-01-21T00:45:00 | FR      | 104.15  | Francúzsko     |
+
+Príklad y tabuľky weather_data
+
+| ID     | Timestamp           | Hodnota | Kód krajiny | Parameter          |
+|--------|----------------------|---------|-------------|--------------------|
+| 840888 | 2025-06-19T09:00:00 | 0       | ES          | ES_precipitation   |
+| 840889 | 2025-06-19T09:00:00 | 3       | ES          | ES_weathercode     |
+| 840890 | 2025-06-19T09:00:00 |         | ES          | ES_weather_text    |
+| 840891 | 2025-06-19T10:00:00 | 33.3    | ES          | ES_temperature     |
+| 840892 | 2025-06-19T10:00:00 | 100     | ES          | ES_cloudcover      |
+| 840893 | 2025-06-19T10:00:00 | 0       | ES          | ES_precipitation   |
+| 840894 | 2025-06-19T10:00:00 | 3       | ES          | ES_weathercode     |
+| 840895 | 2025-06-19T10:00:00 |         | ES          | ES_weather_text    |
+
+
+
+---
+## 🗃️ Architektúra 
+
+                Energy-Charts API
+                       \
+                        \
+                         →→→  Data Collector  →→→  SQLite Database  →→→  Compare.py  →→→  Grafy
+                        /
+                       /
+                Open-Meteo API
+
+
+---
 ## ⚙️ Inštalácia
+### Základné informáacie
+
+Požadovaná verzia pythonu 
+ - 3.10.x
+
+Príkaz pre spustenie FastAPI
+  - uvicorn app.api.main:app --reload,
+
+Príkaz pre spustenie zberu dát  
+  - python main.py.
+
+To usnadní první spuštění projektu.
 
 ### 1. Klonovanie projektu
 
@@ -74,24 +219,21 @@ run main
 pre otvorenie Swaggeru: 
 - uvicorn app.main:app --reload
 - http://127.0.0.1:8000/docs
-  
-
 
 
 ---
 
 ## 📊 Analýza
 
-Skript `compare.py` porovnáva:
+Skript `graf.py` porovnáva:
 - hodinové ceny elektriny,
-- priemernú dennú teplotu,
-- koreláciu medzi nimi.
+- hodinové počasie,
 
-Výstupom môže byť:
-- tabuľka,
-- graf,
-- korelačný koeficient.
+Výstupom je graf:
+ - pre všetky dostupne zóny v Európe
+ - spúšťa sa automatickz po zbere dát v main
 
+![Diagram](newplot.png)
 ---
 
 ## 📄 Licencia
