@@ -6,9 +6,9 @@ Projekt analyzuje vzťah medzi hodinovými cenami elektriny v Europe podla kraji
 
 ## 🔍 Ciele projektu
 - Získať hodinové ceny elektriny pre Európu (EUR/MWh).
-- Získať priemernú dennú teplotu krajiny a pocasie.
+- Získať priemernú dennú teplotu krajiny a počasie.
 - Ukladať dáta do SQLite databázy.
-- Porovnávať vývoj cien elektriny s pocasim.
+- Porovnávať vývoj cien elektriny s počasím.
 - Vytvoriť základ pre ďalšiu analýzu alebo vizualizáciu.
 
 ---
